@@ -218,6 +218,15 @@ export const useGlobalStore = () => {
         tps.clearAllTransactions();
     }
 
+    // THESE FUNCTIONS RETURN WHETHER OR NOT THE TPS HAS TRANSACTIONS TO UNDO OR REDO
+    store.canUndo = function () {
+        return tps.hasTransactionToUndo();
+    }
+
+    store.canRedo = function () {
+        return tps.hasTransactionToRedo();
+    }
+
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = function () {
         async function asyncLoadIdNamePairs() {
