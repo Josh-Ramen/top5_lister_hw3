@@ -230,16 +230,22 @@ export const useGlobalStore = () => {
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = function () {
         async function asyncLoadIdNamePairs() {
-            const response = await api.getTop5ListPairs();
-            if (response.data.success) {
-                let pairsArray = response.data.idNamePairs;
+            try {
+                console.log("looking for id name pairs");
+                const response = await api.getTop5ListPairs();
+                if (response.data.success) {
+                    let pairsArray = response.data.idNamePairs;
+                    storeReducer({
+                        type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                        payload: pairsArray
+                    });
+                }
+            } catch  {
+                let pairsArray = [];
                 storeReducer({
                     type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
                     payload: pairsArray
                 });
-            }
-            else {
-                console.log("API FAILED TO GET THE LIST PAIRS");
             }
         }
         asyncLoadIdNamePairs();
@@ -249,21 +255,19 @@ export const useGlobalStore = () => {
     store.deleteList = function (id) {
         // DELETE THE LIST
         async function asyncDeleteList(id) {
-            let response = await api.deleteTop5ListById(id);
-            if (response.data.success) {
+            console.log("searching to delete id " + id);
+            await api.deleteTop5ListById(id).then(() => {
+                console.log("successfully deleted id " + id);
+
                 // LOAD NEW ID NAME PAIRS
-                async function asyncLoadIdNamePairs() {
-                    const response = await api.getTop5ListPairs();
-                    if (response.data.success) {
-                        let pairsArray = response.data.idNamePairs;
-                        storeReducer({
-                            type: GlobalStoreActionType.DELETE_LIST,
-                            payload: pairsArray
-                        });
-                    }
-                }
-                asyncLoadIdNamePairs();
-            }
+                store.loadIdNamePairs();
+            })
+            .catch(error => {
+                console.log(error.message);
+
+                // LOAD NEW ID NAME PAIRS
+                store.loadIdNamePairs();
+            });
         }
         asyncDeleteList(id);
     }
