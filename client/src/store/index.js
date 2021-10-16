@@ -139,9 +139,12 @@ export const useGlobalStore = () => {
             }
             let response = await api.createTop5List(payload);
             if (response.data.success) {
+                // NEED TO UPDATE idNamePairs AND SET currentList
+                let newId = response.data.top5List._id;
                 async function asyncLoadIdNamePairs() {
                     const response = await api.getTop5ListPairs();
                     if (response.data.success) {
+                        // ALSO NEED 
                         let pairsArray = response.data.idNamePairs;
                         storeReducer({
                             type: GlobalStoreActionType.CREATE_NEW_LIST,
@@ -150,6 +153,9 @@ export const useGlobalStore = () => {
                     }
                 }
                 asyncLoadIdNamePairs();
+
+                // SET currentList
+                store.setCurrentList(newId);
             }
         }
         asyncCreateNewList();
