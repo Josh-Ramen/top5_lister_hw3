@@ -18,7 +18,8 @@ export const GlobalStoreActionType = {
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
-    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE"
+    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    DELETE_LIST: "DELETE_LIST"
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -46,7 +47,6 @@ export const useGlobalStore = () => {
             case GlobalStoreActionType.CREATE_NEW_LIST: {
                 let counter = store.newListCounter;
                 counter++;
-                console.log(counter);
                 return setStore({
                     idNamePairs: payload,
                     currentList: null,
@@ -99,6 +99,17 @@ export const useGlobalStore = () => {
                     isItemEditActive: false,
                     listMarkedForDeletion: null
                 });
+            }
+            // DELETE A LIST
+            case GlobalStoreActionType.DELETE_LIST: {
+                return setStore({
+                    idNamePairs: payload,
+                    currentList: null,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                })
             }
             // START EDITING A LIST NAME
             case GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE: {
@@ -201,6 +212,29 @@ export const useGlobalStore = () => {
             }
         }
         asyncLoadIdNamePairs();
+    }
+
+    // THIS FUNCTION PROCESSES DELETING A LIST
+    store.deleteList = function (id) {
+        // DELETE THE LIST
+        async function asyncDeleteList(id) {
+            let response = await api.deleteTop5ListById(id);
+            if (response.data.success) {
+                // LOAD NEW ID NAME PAIRS
+                async function asyncLoadIdNamePairs() {
+                    const response = await api.getTop5ListPairs();
+                    if (response.data.success) {
+                        let pairsArray = response.data.idNamePairs;
+                        storeReducer({
+                            type: GlobalStoreActionType.DELETE_LIST,
+                            payload: pairsArray
+                        });
+                    }
+                }
+                asyncLoadIdNamePairs();
+            }
+        }
+        asyncDeleteList(id);
     }
 
     // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
