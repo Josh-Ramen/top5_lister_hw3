@@ -7,10 +7,11 @@ import { GlobalStoreContext } from '../store'
     @author McKilla Gorilla
 */
 function Top5Item(props) {
+    let defaultText = props.text;
     const { store } = useContext(GlobalStoreContext);
     const [draggedTo, setDraggedTo] = useState(0);
     const [editActive, setEditActive] = useState(false);
-    const [text, setText] = useState("");
+    const [text, setText] = useState(defaultText);
 
     function handleDragStart(event) {
         event.dataTransfer.setData("item", event.target.id);
@@ -40,7 +41,6 @@ function Top5Item(props) {
         if (newActive) {
             store.setIsItemNameEditActive();
         }
-        console.log(store.currentList);
         setEditActive(newActive);
     }
 
