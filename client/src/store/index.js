@@ -1,6 +1,7 @@
 import { createContext, useState } from 'react'
 import jsTPS from '../common/jsTPS'
 import api from '../api'
+import ChangeItem_Transaction from '../transactions/ChangeItem_Transaction'
 import MoveItem_Transaction from '../transactions/MoveItem_Transaction'
 export const GlobalStoreContext = createContext({});
 /*
@@ -18,6 +19,7 @@ export const GlobalStoreActionType = {
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
+    SET_ITEM_NAME_EDIT_ACTIVE: "SET_ITEM_NAME_EDIT_ACTIVE",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
     DELETE_LIST: "DELETE_LIST"
 }
@@ -121,6 +123,17 @@ export const useGlobalStore = () => {
                     isItemEditActive: false,
                     listMarkedForDeletion: null
                 });
+            }
+            // START EDITING AN ITEM NAME
+            case GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: true,
+                    listMarkedForDeletion: null
+                })
             }
             default:
                 return store;
@@ -290,6 +303,17 @@ export const useGlobalStore = () => {
         // NOW MAKE IT OFFICIAL
         store.updateCurrentList();
     }
+    store.addChangeItemTransaction = function(index, newText) {
+        let oldText = store.currentList.items[index];
+        let transaction = new ChangeItem_Transaction(store, index, oldText, newText);
+        tps.addTransaction(transaction);
+    }
+    store.changeItem = function (index, newText) {
+        store.currentList.items[index] = newText;
+
+        // NOW UPDATE THE LIST
+        store.updateCurrentList();
+    }
     store.updateCurrentList = function() {
         async function asyncUpdateCurrentList() {
             const response = await api.updateTop5ListById(store.currentList._id, store.currentList);
@@ -317,6 +341,13 @@ export const useGlobalStore = () => {
         });
     }
 
+    // THIS FUNCTION ENABLES THE PROCESS OF EDITING AN ITEM NAME
+    store.setIsItemNameEditActive = function () {
+        storeReducer({
+            type: GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE,
+            payload: null
+        });
+    }
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
     return { store, storeReducer };
 }
