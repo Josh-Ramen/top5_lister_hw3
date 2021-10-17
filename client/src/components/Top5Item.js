@@ -8,6 +8,7 @@ import { GlobalStoreContext } from '../store'
 */
 function Top5Item(props) {
     let defaultText = props.text;
+    let { index } = props;
     const { store } = useContext(GlobalStoreContext);
     const [draggedTo, setDraggedTo] = useState(0);
     const [editActive, setEditActive] = useState(false);
@@ -33,6 +34,9 @@ function Top5Item(props) {
 
     function handleToggleEdit(event) {
         event.stopPropagation();
+        let realText = store.currentList.items[index];
+        console.log(realText);
+        setText(realText);
         toggleEdit();
     }
 
@@ -73,7 +77,6 @@ function Top5Item(props) {
         store.addMoveItemTransaction(sourceId, targetId);
     }
 
-    let { index } = props;
     let itemClass = "top5-item";
     if (draggedTo) {
         itemClass = "top5-item-dragged-to";
