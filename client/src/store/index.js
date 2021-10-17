@@ -62,7 +62,7 @@ export const useGlobalStore = () => {
             case GlobalStoreActionType.CHANGE_LIST_NAME: {
                 return setStore({
                     idNamePairs: payload.idNamePairs,
-                    currentList: payload.top5List,
+                    currentList: null,
                     newListCounter: store.newListCounter,
                     isListNameEditActive: false,
                     isItemEditActive: false,
@@ -231,7 +231,6 @@ export const useGlobalStore = () => {
     store.loadIdNamePairs = function () {
         async function asyncLoadIdNamePairs() {
             try {
-                console.log("looking for id name pairs");
                 const response = await api.getTop5ListPairs();
                 if (response.data.success) {
                     let pairsArray = response.data.idNamePairs;
@@ -255,10 +254,7 @@ export const useGlobalStore = () => {
     store.deleteList = function (id) {
         // DELETE THE LIST
         async function asyncDeleteList(id) {
-            console.log("searching to delete id " + id);
             await api.deleteTop5ListById(id).then(() => {
-                console.log("successfully deleted id " + id);
-
                 // LOAD NEW ID NAME PAIRS
                 store.loadIdNamePairs();
             })
