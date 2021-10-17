@@ -23,7 +23,7 @@ function EditToolbar() {
         store.closeCurrentList();
     }
     let editStatus = false;
-    if (store.isListNameEditActive || store.isItemNameEditActive) {
+    if (store.isListNameEditActive || store.isItemEditActive) {
         editStatus = true;
     }
     if (!store.canUndo() || editStatus) {

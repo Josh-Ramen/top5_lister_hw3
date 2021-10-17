@@ -169,9 +169,14 @@ body {
   background-color: var(--swatch-complement);
 }
 
-.list-card-button {
+.list-card-button, .list-card-button-disabled {
   float:right;
   font-size:18pt;
+}
+
+.list-card-button-disabled {
+  opacity: 0.25; 
+  cursor: not-allowed;
 }
 
 #workspace-home, #workspace-edit {

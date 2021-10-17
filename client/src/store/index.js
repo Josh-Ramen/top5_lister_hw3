@@ -339,7 +339,7 @@ export const useGlobalStore = () => {
         asyncSetCurrentList(id);
     }
     store.addMoveItemTransaction = function (start, end) {
-        if (start !== end) {
+        if (start != end) {
             let transaction = new MoveItem_Transaction(store, start, end);
             tps.addTransaction(transaction);
         }
@@ -370,6 +370,8 @@ export const useGlobalStore = () => {
         if (oldText !== newText) {
             let transaction = new ChangeItem_Transaction(store, index, oldText, newText);
             tps.addTransaction(transaction);
+        } else {
+            store.updateCurrentList();
         }
     }
     store.changeItem = function (index, newText) {

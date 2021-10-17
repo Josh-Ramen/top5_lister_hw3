@@ -14,6 +14,11 @@ function Top5Item(props) {
     const [editActive, setEditActive] = useState(false);
     const [text, setText] = useState(defaultText);
 
+    let editStatus = false;
+    if (store.isListNameEditActive || store.isItemEditActive) {
+        editStatus = true;
+    }
+
     function handleDragStart(event) {
         event.dataTransfer.setData("item", event.target.id);
     }
@@ -33,11 +38,12 @@ function Top5Item(props) {
     }
 
     function handleToggleEdit(event) {
-        event.stopPropagation();
-        let realText = store.currentList.items[index];
-        console.log(realText);
-        setText(realText);
-        toggleEdit();
+        if (!editStatus) {
+            event.stopPropagation();
+            let realText = store.currentList.items[index];
+            setText(realText);
+            toggleEdit();
+        }
     }
 
     function toggleEdit() {
@@ -82,6 +88,10 @@ function Top5Item(props) {
         itemClass = "top5-item-dragged-to";
     }
 
+    let buttonClass = "list-card-button";
+    if (editStatus) {
+        buttonClass += "-disabled";
+    }
     let itemElement =
         <div
             id={'item-' + (index + 1)}
@@ -96,7 +106,7 @@ function Top5Item(props) {
             <input
                 type="button"
                 id={"edit-item-" + index + 1}
-                className="list-card-button"
+                className={buttonClass}
                 onClick={handleToggleEdit}
                 value={"\u270E"}
             />
