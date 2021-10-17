@@ -59,7 +59,7 @@ function ListCard(props) {
 
     function handleDeleteList(event) {
         event.stopPropagation();
-        store.deleteList(event.target.id.substring("delete-list-".length))
+        store.markListForDeletion(event.target.id.substring("delete-list-".length))
     }
 
     let selectClass = "unselected-list-card";

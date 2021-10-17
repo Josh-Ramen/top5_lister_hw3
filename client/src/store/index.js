@@ -21,6 +21,7 @@ export const GlobalStoreActionType = {
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_ITEM_NAME_EDIT_ACTIVE: "SET_ITEM_NAME_EDIT_ACTIVE",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    MARK_LIST_FOR_DELETION: "MARK_LIST_FOR_DELETION",
     DELETE_LIST: "DELETE_LIST"
 }
 
@@ -101,6 +102,17 @@ export const useGlobalStore = () => {
                     isItemEditActive: false,
                     listMarkedForDeletion: null
                 });
+            }
+            // MARK LIST FOR DELETION
+            case GlobalStoreActionType.MARK_LIST_FOR_DELETION: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: null,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: payload
+                })
             }
             // DELETE A LIST
             case GlobalStoreActionType.DELETE_LIST: {
@@ -250,10 +262,43 @@ export const useGlobalStore = () => {
         asyncLoadIdNamePairs();
     }
 
+    // THIS FUNCTION PROCESSES MARKING A LIST FOR DELETION
+    store.markListForDeletion = function (id) {
+        async function asyncMarkListForDeletion(id) {
+            // GET THE LIST BY ITS ID
+            let response = await api.getTop5ListById(id);
+            if (response.data.success) {
+                let top5List = response.data.top5List;
+
+                storeReducer({
+                    type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
+                    payload: top5List
+                });
+
+                // SHOW THE DELETE LIST MODAL
+                store.showDeleteListModal();
+            }
+        }
+        asyncMarkListForDeletion(id);
+    }
+
+    // THIS FUNCTION SHOWS THE DELETE LIST MODAL
+    store.showDeleteListModal = function () {
+        let modal = document.getElementById("delete-modal");
+        modal.classList.add("is-visible");
+    }
+
+    // THIS FUNCTION HIDES THE DELETE LIST MODAL
+    store.hideDeleteListModal = function () {
+        let modal = document.getElementById("delete-modal");
+        modal.classList.remove("is-visible");
+    }
+
     // THIS FUNCTION PROCESSES DELETING A LIST
-    store.deleteList = function (id) {
+    store.deleteMarkedList = function () {
         // DELETE THE LIST
-        async function asyncDeleteList(id) {
+        async function asyncDeleteList() {
+            let id = store.listMarkedForDeletion._id;
             await api.deleteTop5ListById(id).then(() => {
                 // LOAD NEW ID NAME PAIRS
                 store.loadIdNamePairs();
@@ -261,11 +306,14 @@ export const useGlobalStore = () => {
             .catch(error => {
                 console.log(error.message);
 
+                // HIDE DELETE LIST MODAL
+                store.hideDeleteListModal();
+
                 // LOAD NEW ID NAME PAIRS
                 store.loadIdNamePairs();
             });
         }
-        asyncDeleteList(id);
+        asyncDeleteList();
     }
 
     // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
