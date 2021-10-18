@@ -28,6 +28,8 @@ export const GlobalStoreActionType = {
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
 const tps = new jsTPS();
 
+let counter = 0;
+
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
 // AVAILABLE TO THE REST OF THE APPLICATION
 export const useGlobalStore = () => {
@@ -48,12 +50,11 @@ export const useGlobalStore = () => {
         switch (type) {
             // CREATE A NEW LIST
             case GlobalStoreActionType.CREATE_NEW_LIST: {
-                let counter = store.newListCounter;
                 counter++;
                 return setStore({
                     idNamePairs: payload,
                     currentList: null,
-                    newListCounter: counter,
+                    newListCounter: store.newListCounter + 1,
                     isListNameEditActive: false,
                     isItemeditActive: false,
                     listMarkedForDeletion: null
@@ -159,7 +160,7 @@ export const useGlobalStore = () => {
     store.createNewList = function() {
         async function asyncCreateNewList() {
             let payload = {
-                "name": "Untitled" + store.newListCounter,
+                "name": "Untitled" + counter,
                 "items": ["?", "?", "?", "?", "?"]
             }
             let response = await api.createTop5List(payload);
@@ -300,6 +301,9 @@ export const useGlobalStore = () => {
         async function asyncDeleteList() {
             let id = store.listMarkedForDeletion._id;
             await api.deleteTop5ListById(id).then(() => {
+                // HIDE DELETE LIST MODAL
+                store.hideDeleteListModal();
+
                 // LOAD NEW ID NAME PAIRS
                 store.loadIdNamePairs();
             })
@@ -339,7 +343,7 @@ export const useGlobalStore = () => {
         asyncSetCurrentList(id);
     }
     store.addMoveItemTransaction = function (start, end) {
-        if (start != end) {
+        if (start !== end) {
             let transaction = new MoveItem_Transaction(store, start, end);
             tps.addTransaction(transaction);
         }
