@@ -12,20 +12,27 @@ function EditToolbar() {
     const history = useHistory();
 
     let undoClass = "top5-button", redoClass = "top5-button", closeClass="top5-button";
-    function handleUndo() {
-        store.undo();
-    }
-    function handleRedo() {
-        store.redo();
-    }
-    function handleClose() {
-        history.push("/");
-        store.closeCurrentList();
-    }
     let editStatus = false;
     if (store.isListNameEditActive || store.isItemEditActive) {
         editStatus = true;
     }
+    function handleUndo() {
+        if (store.canUndo() && !editStatus) {
+            store.undo();
+        }
+    }
+    function handleRedo() {
+        if (store.canRedo() && !editStatus) {
+            store.redo();
+        }
+    }
+    function handleClose() {
+        if (!editStatus && (store.currentList !== null)) {
+            history.push("/");
+            store.closeCurrentList();
+        }
+    }
+    
     if (!store.canUndo() || editStatus) {
         undoClass += "-disabled";
     }
