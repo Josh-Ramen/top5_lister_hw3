@@ -194,7 +194,11 @@ export const useGlobalStore = () => {
             let response = await api.getTop5ListById(id);
             if (response.data.success) {
                 let top5List = response.data.top5List;
-                top5List.name = newName;
+                if (newName === "") {
+                    top5List.name = "?";
+                } else {
+                    top5List.name = newName;
+                }
                 async function updateList(top5List) {
                     response = await api.updateTop5ListById(top5List._id, top5List);
                     if (response.data.success) {
