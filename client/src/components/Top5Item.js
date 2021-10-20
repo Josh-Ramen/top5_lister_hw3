@@ -20,21 +20,29 @@ function Top5Item(props) {
     }
 
     function handleDragStart(event) {
-        event.dataTransfer.setData("item", event.target.id);
+        if (!editStatus) {
+            event.dataTransfer.setData("item", event.target.id);
+        }
     }
 
     function handleDragOver(event) {
-        event.preventDefault();
+        if (!editStatus) {
+            event.preventDefault();
+        }
     }
 
     function handleDragEnter(event) {
-        event.preventDefault();
-        setDraggedTo(true);
+        if (!editStatus) {
+            event.preventDefault();
+            setDraggedTo(true);
+        }
     }
 
     function handleDragLeave(event) {
-        event.preventDefault();
-        setDraggedTo(false);
+        if (!editStatus) {
+            event.preventDefault();
+            setDraggedTo(false);
+        }
     }
 
     function handleToggleEdit(event) {
@@ -71,16 +79,18 @@ function Top5Item(props) {
     }
 
     function handleDrop(event) {
-        event.preventDefault();
-        let target = event.target;
-        let targetId = target.id;
-        targetId = targetId.substring(target.id.indexOf("-") + 1);
-        let sourceId = event.dataTransfer.getData("item");
-        sourceId = sourceId.substring(sourceId.indexOf("-") + 1);
-        setDraggedTo(false);
+        if (!editStatus) {
+            event.preventDefault();
+            let target = event.target;
+            let targetId = target.id;
+            targetId = targetId.substring(target.id.indexOf("-") + 1);
+            let sourceId = event.dataTransfer.getData("item");
+            sourceId = sourceId.substring(sourceId.indexOf("-") + 1);
+            setDraggedTo(false);
 
-        // UPDATE THE LIST
-        store.addMoveItemTransaction(sourceId, targetId);
+            // UPDATE THE LIST
+            store.addMoveItemTransaction(sourceId, targetId);
+        }
     }
 
     let itemClass = "top5-item";
