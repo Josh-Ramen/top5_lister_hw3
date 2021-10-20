@@ -92,6 +92,8 @@ function Top5Item(props) {
     if (editStatus) {
         buttonClass += "-disabled";
     }
+
+    let canDrag = !(store.isListNameEditActive || store.isItemEditActive);
     let itemElement =
         <div
             id={'item-' + (index + 1)}
@@ -101,7 +103,7 @@ function Top5Item(props) {
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            draggable="true"
+            draggable={canDrag}
         >
             <input
                 type="button"
@@ -120,7 +122,6 @@ function Top5Item(props) {
                 type='text'
                 autoFocus={true}
                 onKeyPress={handleKeyPress}
-                onBlur={handleBlur}
                 onChange={handleUpdateText}
                 defaultValue={props.text}
             />;
